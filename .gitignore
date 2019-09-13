@@ -1,0 +1,8 @@
+Build/
+*.log
+*.zcx
+*.exe
+*.lib
+*.obj
+*.a
+*.out
