@@ -1,8 +1,6 @@
-Build/
-*.log
-*.zcx
-*.exe
-*.lib
-*.obj
-*.a
-*.out
+build
+.idea
+.DS_Store
+cmake-*
+__.*
+*.sh

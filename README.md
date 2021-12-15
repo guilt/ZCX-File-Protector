@@ -1,13 +1,14 @@
 Zip-Case-X File Protector SV
 ============================
 
-This is the Stable Version of my File Protection programs.
+This is the Stable Version of my File Protection programs circa 2002.
 
 Files encrypted in one Operating System  are compatible with the others
-too, but ensure that the file names are initially in the DOS 8.3 format
-(such as .HTM, .MPG ). The File to be Encoded must be in the current
-directory. Avoid usage of . and .. or Directory Slashes in files, as
-DOS and Unix / Linux are incompatible in that aspect.
+too, but ensure that the file names are initially in the **DOS 8.3 format**
+(such as `.HTM`, `.MPG` ). The File to be Encoded must be in the current
+directory. Avoid usage of `.` and `..` or Directory slashes in files, as
+DOS and Unix / Linux are incompatible in that aspect and we do not attempt
+to interpret them.
 
 ## How to Use
 
@@ -23,7 +24,8 @@ to restore your original file.
 
 ## Restrictions
 
-This should not be used for any Bad Purposes Whatsoever. Use your judgment.
+This should not be used for any illegal purposes whatsoever.
+Use your judgment.
 
 ## Compatibility
 
@@ -31,12 +33,12 @@ When you use this most current version, files in the previous
 versions won't Comply. So please retain the Older Version for
 Decrypting Purposes. Thank You for getting this Product.
 
-## Thank You
+## Thank You and Feedback
 
-If you have a grouse against this, do Visit my [Page](http://karthikkumar.org)
-and E-Mail me.
+Reach out to me for any feedback.
 
 Now Enjoy!
 
-                                              - Karthik Kumar V
-                                                  March, 2002.
+* Author: Karthik Kumar Viswanathan
+* Web   : https://karthikkumar.org
+* Email : karthikkumar@gmail.com
