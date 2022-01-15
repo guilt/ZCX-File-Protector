@@ -1,6 +1,11 @@
 build
+build-*
+cmake-*
+
 .idea
 .DS_Store
-cmake-*
+
 __.*
+*.zcx
 *.sh
+*.tmp

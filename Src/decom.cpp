@@ -43,7 +43,7 @@ int main(int argc, char* argv[FILENAMELENGTH])
     infile.read((char*)&plen, sizeof(long));
     infile.read(passwdc, plen);
     operationOne(plen, passwd);
-    if (strcmp(passwdc, passwd) != 0) {
+    if (memcmp(passwdc, passwd, plen) != 0) {
         printe("\nSorry, Wrong Password !\n");
         infile.close();
         return -1;
@@ -87,7 +87,7 @@ int main(int argc, char* argv[FILENAMELENGTH])
     outfile.close();
     infile.close();
     printf("\nDone : %s => %s !\n", ifile, ofile);
-    if (strcmp((char*)buptable, (char*)uptable) == 0) {
+    if (memcmp((char*)buptable, (char*)uptable, KEYLENGTHSIZE) == 0) {
         printf("Checksum Match, File OK !\n");
     }
     else {
