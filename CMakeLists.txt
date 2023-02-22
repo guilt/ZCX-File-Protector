@@ -10,6 +10,9 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
  set(LINUX ON)
 endif()
 
+# Enable Full-Fledged Debugging
+# add_definitions(-DDEBUG)
+
 if(WIN32)
   # See https://blog.kitware.com/create-dlls-on-windows-without-declspec-using-new-cmake-export-all-feature/
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)

@@ -7,14 +7,15 @@
 #include "fileinp.h"
 
 void writeHeaderToFile(ofstream &outfile) {
-    outfile.write((const char *)"EF", 2);
+    char header[2]={'E','F'};
+    blockWritePtr(header, 2, outfile);
 }
 
 void writePasswordToFile(ofstream &outfile, char passwd[KEY_LENGTH_SIZE_WITH_ZERO], long_t passwordLength) {
-    outfile.write((char*)&passwordLength, sizeof(long_t));
+    blockWrite(passwordLength, sizeof(long_t), outfile);
     operationThree(passwordLength, passwd);
     operationOne(passwordLength, passwd);
-    outfile.write(passwd, passwordLength);
+    blockWritePtr(passwd, passwordLength, outfile);
 }
 
 long_t writeFileNameToFile(ofstream &outfile, char fileName[FILENAME_LENGTH], long_t fileNameLength) {
@@ -23,8 +24,8 @@ long_t writeFileNameToFile(ofstream &outfile, char fileName[FILENAME_LENGTH], lo
     strcpy(fileNameTemp, fileName);
 
     operationFive(fileNameLength, fileNameTemp);
-    outfile.write((char *) &fileNameLength, sizeof(long_t));
-    outfile.write(fileNameTemp, fileNameLength);
+    blockWrite(fileNameLength, sizeof(long_t), outfile);
+    blockWritePtr(fileNameTemp, fileNameLength, outfile);
 
     return fileNameLength;
 }
@@ -60,12 +61,12 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     if (argc > 2) {
         strcpy(outFileName, argv[2]);
     } else {
-#ifdef IDOS
+#if defined(IDOS)
         strcpy(outFileName, DEFAULT_FILE); // Default File to Write
-#else
+#else //defined(IDOS)
         strcpy(outFileName, infileName);
         strcat(outFileName, ".zcx");
-#endif
+#endif //defined(IDOS)
     }
 
     infile.open(infileName, ios::in | ios_binary);
@@ -93,26 +94,26 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     writePasswordToFile(outfile, passwd, passwordLength);
     writeFileNameToFile(outfile, infileName, fileNameLength);
 
-    outfile.write((char *) &fileLength, sizeof(long_t));
+    blockWrite(fileLength, sizeof(long_t), outfile);
 
     extraSpace = fileLength % KEY_LENGTH_SIZE;
     numberOfBlocks = fileLength / KEY_LENGTH_SIZE;
 
-    beginProgress();
     initializeIntron(passwordLength, fileNameLength);
 
+    beginProgress();
     for (i = 0; i < numberOfBlocks; i++) {
-        infile.read((char*)array, KEY_LENGTH_SIZE);
-        updateProgress(i, numberOfBlocks);
+        blockReadPtr(array, KEY_LENGTH_SIZE, infile);
         operationSeven(KEY_LENGTH_SIZE, array);
-        outfile.write((char*)array, KEY_LENGTH_SIZE);
+        blockWritePtr(array, KEY_LENGTH_SIZE, outfile);
         updateIntron();
         writeIntron();
+        updateProgress(i, numberOfBlocks);
     }
 
-    infile.read((char*)array, extraSpace);
+    blockReadPtr(array, extraSpace, infile);
     operationSeven(extraSpace, array);
-    outfile.write((char*)array, extraSpace);
+    blockWritePtr(array, extraSpace, outfile);
     updateIntron();
     writeIntron();
 

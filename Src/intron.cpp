@@ -2,7 +2,7 @@
 
 extern "C" {
 
-#ifdef USE_INTRON
+#if defined(USE_INTRON)
 // Intron Table
 unsigned char intronTable[KEY_LENGTH_SIZE_WITH_ZERO]= {
         9,   7,   32,  13,  2,   4,   7,   80, 214, 90,  76,  5,   54,
@@ -17,6 +17,6 @@ long_t intronFactor = 1;  // Maximum Insertion Length Parameter
 long_t keyFactor = KEY_LENGTH_SIZE;
 long_t intronCounter = 0;
 
-#endif //USE_INTRON
+#endif //defined(USE_INTRON)
 
 }

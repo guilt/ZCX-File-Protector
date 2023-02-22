@@ -7,7 +7,10 @@
 #include "fileinp.h"
 
 int getHeaderFromFile(ifstream &infile) {
-    if (infile.get() != 'E' || infile.get() != 'F') {
+    char header[2];
+
+    blockReadPtr(header, 2, infile);
+    if (header[0] != 'E' || header[1] != 'F') {
         printError("\nInvalid Header. Not a Proper Encrypted File!\n");
         return -1;
     }
@@ -21,8 +24,8 @@ long_t getPasswordFromFile(ifstream &infile, char passwd[KEY_LENGTH_SIZE_WITH_ZE
 
     memset(passwdCiphered, 0, KEY_LENGTH_SIZE_WITH_ZERO);
 
-    infile.read((char *)&passwordCipheredLength, sizeof(long_t));
-    infile.read((char *)&passwdCiphered, passwordCipheredLength);
+    blockRead(passwordCipheredLength, sizeof(long_t), infile);
+    blockReadPtr(passwdCiphered, passwordCipheredLength, infile);
 
     operationOne(passwordLength, passwd);
 
@@ -40,20 +43,20 @@ long_t getPasswordFromFile(ifstream &infile, char passwd[KEY_LENGTH_SIZE_WITH_ZE
 
 long_t getFileNameFromFile(ifstream &infile, char *outfileName) {
     long_t fileNameLength;
-    infile.read((char*)&fileNameLength, sizeof(long_t));
-    infile.read(outfileName, fileNameLength);
+    blockRead(fileNameLength, sizeof(long_t), infile);
+    blockReadPtr(outfileName, fileNameLength, infile);
     outfileName[fileNameLength] = 0;
     operationFour(fileNameLength, outfileName);
     return fileNameLength;
 }
 
 int verifyCheckSum(ifstream &infile) {
-    unsigned char preBuiltUptable[KEY_LENGTH_SIZE_WITH_ZERO];
-    memset(preBuiltUptable, 0, sizeof(preBuiltUptable));
+    unsigned char preBuiltUpTable[KEY_LENGTH_SIZE_WITH_ZERO];
 
-    infile.read((char*)preBuiltUptable, KEY_LENGTH_SIZE);
+    memset(preBuiltUpTable, 0, sizeof(preBuiltUpTable));
+    blockReadPtr(preBuiltUpTable, KEY_LENGTH_SIZE, infile);
 
-    if (memcmp(preBuiltUptable, upTable, KEY_LENGTH_SIZE) != 0) {
+    if (memcmp(preBuiltUpTable, upTable, KEY_LENGTH_SIZE) != 0) {
         printError("Checksum Mismatch, File Corrupt !\n");
         return -1;
     }
@@ -103,7 +106,7 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     }
     fileNameLength = getFileNameFromFile(infile, outfileName);
 
-    infile.read((char*)&fileLength, sizeof(long_t));
+    blockRead(fileLength, sizeof(long_t), infile);
     printf("File Length: %ld\n", fileLength);
 
     outfile.open(outfileName, ios::out | ios_binary);
@@ -116,21 +119,21 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     extraSpace = fileLength % KEY_LENGTH_SIZE;
     numberOfBlocks = fileLength / KEY_LENGTH_SIZE;
 
-    beginProgress();
     initializeIntron(passwordLength, fileNameLength);
 
+    beginProgress();
     for (i = 0; i < numberOfBlocks; i++) {
-        infile.read((char*)array, KEY_LENGTH_SIZE);
+        blockReadPtr(array, KEY_LENGTH_SIZE, infile); 
         operationSix(KEY_LENGTH_SIZE, array);
-        outfile.write((char*)array, KEY_LENGTH_SIZE);
+        blockWritePtr(array, KEY_LENGTH_SIZE, outfile);
         updateIntron();
         readIntron();
         updateProgress(i, numberOfBlocks);
     }
 
-    infile.read((char*)array, extraSpace);
+    blockReadPtr(array, extraSpace, infile);
     operationSix(extraSpace, array);
-    outfile.write((char*)array, extraSpace);
+    blockWritePtr(array, extraSpace, outfile);
     updateIntron();
     readIntron();
 

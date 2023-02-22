@@ -2,6 +2,7 @@
 #define ZCX_USERINP_H
 
 #include "constant.h"
+#include "intron.h"
 
 #if defined(ILIN) || defined(IUNI) || defined(IAPPLE)
 //Unix/Linux User Interface for Passwords
@@ -54,10 +55,11 @@ int getHiddenChar() {
 #include <conio.h>
 #define getHiddenChar getch
 #endif //defined(IDOS)
+
 #if defined(IWIN)
 #include <conio.h>
 #define getHiddenChar _getch
-#endif //IWIN
+#endif //defined(IWIN)
 
 #if defined(IDOS) || defined(IWIN)
 
@@ -110,6 +112,9 @@ int userPromptWithArg(const char *message, char *arg) {
         c = getHiddenChar();
     } while (c != 'y' && c != 'Y' && c != 'n' && c != 'N' && c != EOF);
     c = tolower(c & 0xFF);
+#if defined(DEBUG)
+    printf("DEBUG: [userPromptWithArg] User pressed: [%d] = %c\n", c, c);
+#endif //defined(DEBUG)
     return c;
 }
 
@@ -120,12 +125,54 @@ int userPrompt(const char *message) {
         c = getHiddenChar();
     } while (c != 'y' && c != 'Y' && c != 'n' && c != 'N' && c != EOF);
     c = tolower(c & 0xFF);
+#if defined(DEBUG)
+    printf("DEBUG: [userPrompt] User pressed: [%d] = %c\n", c, c);
+#endif //defined(DEBUG)
     return c;
+}
+
+void printInitializedValues() {
+#if defined(DEBUG)
+    printArray("upTable", upTable, KEY_LENGTH_SIZE_WITH_ZERO);
+    printArray("coTable", coTable, KEY_LENGTH_SIZE_WITH_ZERO);
+    printArray("_KPTable", _KPTable, KEY_LENGTH_SIZE_WITH_ZERO);
+    printArray("aKPTable", aKPTable, KEY_LENGTH_SIZE_WITH_ZERO);
+    printArray("bKPTable", bKPTable, KEY_LENGTH_SIZE_WITH_ZERO);
+    printArray("cKPTable", cKPTable, KEY_LENGTH_SIZE_WITH_ZERO);
+    printArray("dTable", dTable, KEY_ARRAY_SIZE);
+    printArray("eTable", eTable, KEY_ARRAY_SIZE);
+    printArray("fTable", fTable, KEY_ARRAY_SIZE);
+    printArray("gTable", gTable, KEY_ARRAY_SIZE);
+#endif //defined(DEBUG)
 }
 
 void headerPrint() {
     printf("*** Version %s File Protector ***\n", VER);
     printf("        Authored By %s\n", AUTHOR);
+#if defined(DEBUG)
+#if defined(ILIN)
+    printf("DEBUG: [headerPrint] on Linux.\n");
+#endif //defined(ILIN)
+#if defined(IAPPLE)
+    printf("DEBUG: [headerPrint] on Apple.\n");
+#endif //defined(IAPPLE)
+#if defined(IWIN)
+    printf("DEBUG: [headerPrint] on Windows.\n");
+#endif //defined(IWIN)
+#if defined(IDOS)
+    printf("DEBUG: [headerPrint] on DOS.\n");
+#endif //defined(IDOS)
+#if defined(IUNI)
+    printf("DEBUG: [headerPrint] on Unix.\n");
+#endif //defined(IUNI)
+    printf("DEBUG: [headerPrint] long_t Size: %d\n", sizeof(long_t));
+#if defined(USE_INTRON)
+    printf("DEBUG: [headerPrint] Using Intron Code.\n");
+#else  //defined(USE_INTRON)
+    printf("DEBUG: [headerPrint] No Intron Code.\n");
+#endif //defined(USE_INTRON)
+    printInitializedValues();
+#endif //defined(DEBUG)
 }
 
 void getPassword(char passwd[KEY_LENGTH_SIZE_WITH_ZERO]) {
@@ -136,6 +183,10 @@ void getPassword(char passwd[KEY_LENGTH_SIZE_WITH_ZERO]) {
         printf("(Minimum %d Characters, Maximum %i Characters) :\n", MIN_KEY_LENGTH_SIZE, KEY_LENGTH_SIZE);
         getHiddenString(passwd);
     } while (strlen(passwd) < MIN_KEY_LENGTH_SIZE);
+
+#if defined(DEBUG)
+    printf("DEBUG [getPassword]: Password: [%s]\n", passwd);
+#endif //defined(DEBUG)
 }
 
 void getPasswordWithConfirmation(char passwd[KEY_LENGTH_SIZE_WITH_ZERO]) {
@@ -150,12 +201,33 @@ void getPasswordWithConfirmation(char passwd[KEY_LENGTH_SIZE_WITH_ZERO]) {
         getHiddenString(passwdConfirm);
     } while (strlen(passwdConfirm) < MIN_KEY_LENGTH_SIZE || strcmp(passwdConfirm, passwd) != 0);
 
+#if defined(DEBUG)
+    printf("DEBUG [getPasswordWithConfirmation]: Password: [%s]\n", passwd);
+#endif //defined(DEBUG)
 }
 
-#define beginProgress() printf("Progress Status: %03d %%", 0);
+#if defined(DEBUG)
 
-#define updateProgress(current, full) printf("\b\b\b\b\b%03d %%", (int)( (long_t)(current * 100) / full));
+#define beginProgress() \
+    printf("DEBUG [beginProgress]: Progress at Beginning.\n");
 
-#define completeProgress() printf("\b\b\b\b\b%03d %%\n", 100);
+#define updateProgress(current, full) \
+    printf("DEBUG [updateProgress]: Current Progress at %ld/%ld.\n", current, full);
+
+#define completeProgress() \
+    printf("DEBUG [completeProgress]: Progress Complete\n");
+
+#else //defined(DEBUG)
+
+#define beginProgress() \
+    printf("Progress Status: %03d %%", 0); \
+
+#define updateProgress(current, full) \
+    printf("\b\b\b\b\b%03d %%", (int)( (long_t)(current * 100) / full));
+
+#define completeProgress() \
+    printf("\b\b\b\b\b%03d %%\n", 100);
+
+#endif //defined(DEBUG)
 
 #endif //ZCX_USERINP_H
