@@ -1,108 +1,130 @@
 // Encryption
 #include "constant.h"
 #include "common.h"
-#include "userinp.h"
 #include "tables.h"
 #include "intron.h"
+#include "userinp.h"
+#include "fileinp.h"
 
-int main(int argc, char* argv[FILENAMELENGTH])
+void writeHeaderToFile(ofstream &outfile) {
+    outfile.write((const char *)"EF", 2);
+}
+
+void writePasswordToFile(ofstream &outfile, char passwd[KEY_LENGTH_SIZE_WITH_ZERO], long_t passwordLength) {
+    outfile.write((char*)&passwordLength, sizeof(long_t));
+    operationThree(passwordLength, passwd);
+    operationOne(passwordLength, passwd);
+    outfile.write(passwd, passwordLength);
+}
+
+long_t writeFileNameToFile(ofstream &outfile, char fileName[FILENAME_LENGTH], long_t fileNameLength) {
+    char fileNameTemp[FILENAME_LENGTH];
+
+    strcpy(fileNameTemp, fileName);
+
+    operationFive(fileNameLength, fileNameTemp);
+    outfile.write((char *) &fileNameLength, sizeof(long_t));
+    outfile.write(fileNameTemp, fileNameLength);
+
+    return fileNameLength;
+}
+
+void writeCheckSum(ofstream &outfile) {
+    outfile.write((char*)upTable, KEY_LENGTH_SIZE);
+}
+
+int main(int argc, char* argv[FILENAME_LENGTH])
 {
-    long_t i, plen, fnlen, flen, es, ntimes;
-    unsigned char array[TABLESIZE];
-    char passwd[TABLESIZE], passwdc[TABLESIZE];
-    char ifile[FILENAMELENGTH], ofile[FILENAMELENGTH], ifiletmp[FILENAMELENGTH];
+    long_t i, extraSpace, numberOfBlocks, fileLength;
+    long_t passwordLength, fileNameLength;
+
+    char passwd[KEY_LENGTH_SIZE_WITH_ZERO];
+    unsigned char array[KEY_LENGTH_SIZE_WITH_ZERO];
+
+    char infileName[FILENAME_LENGTH], outFileName[FILENAME_LENGTH];
+
     ifstream infile;
     ofstream outfile;
-    char c;
-    for (i = 0; i < TABLESIZE; i++) {
-        array[i] = passwd[i] = passwdc[i] = 0;
-    }
-    printf("***Version %s File Protector***\n", VER);
-    printf("Encryptor : Authored By %s\n", AUTHOR);
-    if (argc != 2 && argc != 3) {
-        printe("\nFormat :\n");
-        printe("%s File <EncodedFile>\n", argv[0]);
+
+    memset(array, 0, sizeof(array));
+
+    headerPrint();
+    if(argc < 2 || argc > 3) {
+        printError("\nFormat: \n");
+        printError("%s File <EncryptedFile>\n", argv[0]);
         return -1;
     }
-    strcpy(ifile, argv[1]);
-    strcpy(ifiletmp, argv[1]);
-    infile.open(ifile, ios::in | ios_binary);
-    if (!infile) {
-        printe("\nFile : %s not found !\n", ifile);
-        return -1;
-    }
-    infile.seekg(0, ios::end);
-    flen = infile.tellg();
-    infile.seekg(0, ios::beg);
-    if (argc == 2) {
+
+    strcpy(infileName, argv[1]);
+
+    if (argc > 2) {
+        strcpy(outFileName, argv[2]);
+    } else {
 #ifdef IDOS
-        strcpy(ofile, DEFAULT_FILE); // Default File to Write
+        strcpy(outFileName, DEFAULT_FILE); // Default File to Write
 #else
-        strcpy(ofile, ifile);
-        strcat(ofile, ".zcx");
+        strcpy(outFileName, infileName);
+        strcat(outFileName, ".zcx");
 #endif
     }
-    if (argc == 3) {
-        strcpy(ofile, argv[2]);
+
+    infile.open(infileName, ios::in | ios_binary);
+    if (!infile) {
+        printError("\nFile: %s not found !\n", infileName);
+        return -1;
     }
-    outfile.open(ofile, ios::out | ios_binary);
+
+    getPasswordWithConfirmation(passwd);
+
+    getFileLength(fileLength, infile);
+    printf("File Length: %ld\n", fileLength);
+
+    outfile.open(outFileName, ios::out | ios_binary);
     if (!outfile) {
-        printe("\nFile : %s Can't be Written !\n", ofile);
+        printError("\nFile: %s Can't be Written !\n", outFileName);
         infile.close();
         return -1;
     }
-    do {
-        printf("Enter Password\n");
-        printf("(Minimum 8 Characters, Maximum %i Characters) :\n", KEYLENGTHSIZE);
-        getpasswd(passwd);
-    } while (strlen(passwd) < 8 || strlen(passwd) >= TABLESIZE);
-    do {
-        printf("Please Re-Enter Password to Confirm :\n");
-        getpasswd(passwdc);
-    } while (strcmp(passwdc, passwd) != 0);
-    outfile << "EF";
-    plen = strlen(passwd);
-    operationThree(plen, passwd);
-    operationOne(plen, passwd);
-    outfile.write((char*)&plen, sizeof(long_t));
-    outfile.write(passwd, plen);
-    fnlen = strlen(ifiletmp);
-    operationFive(fnlen, ifiletmp);
-    outfile.write((char*)&fnlen, sizeof(long));
-    outfile.write(ifiletmp, fnlen);
-    outfile.write((char*)&flen, sizeof(long));
-    es = flen % KEYLENGTHSIZE;
-    ntimes = flen / KEYLENGTHSIZE;
-    printf("File Length : ");
-    printf("%ld\n", flen);
-    printf("Progress Status :\n");
-    bfainit();
-    for (i = 0; i < ntimes; i++) {
-        infile.read((char*)array, KEYLENGTHSIZE);
-        printf("%03i %%\b\b\b\b\b", (int)((i * 100) / ntimes));
-        operationSeven(KEYLENGTHSIZE, array);
-        outfile.write((char*)array, KEYLENGTHSIZE);
-        docount();
-        wintron();
+
+    passwordLength = (long_t) strlen(passwd);
+    fileNameLength = (long_t) strlen(infileName);
+
+    writeHeaderToFile(outfile);
+    writePasswordToFile(outfile, passwd, passwordLength);
+    writeFileNameToFile(outfile, infileName, fileNameLength);
+
+    outfile.write((char *) &fileLength, sizeof(long_t));
+
+    extraSpace = fileLength % KEY_LENGTH_SIZE;
+    numberOfBlocks = fileLength / KEY_LENGTH_SIZE;
+
+    beginProgress();
+    initializeIntron(passwordLength, fileNameLength);
+
+    for (i = 0; i < numberOfBlocks; i++) {
+        infile.read((char*)array, KEY_LENGTH_SIZE);
+        updateProgress(i, numberOfBlocks);
+        operationSeven(KEY_LENGTH_SIZE, array);
+        outfile.write((char*)array, KEY_LENGTH_SIZE);
+        updateIntron();
+        writeIntron();
     }
-    infile.read((char*)array, es);
-    array[es] = 0;
-    operationSeven(es, array);
-    outfile.write((char*)array, es);
-    docount();
-    wintron();
-    uptable[TABLESIZE - 1] = 0;
-    outfile.write((char*)uptable, KEYLENGTHSIZE);
-    printf("100 %%");
+
+    infile.read((char*)array, extraSpace);
+    operationSeven(extraSpace, array);
+    outfile.write((char*)array, extraSpace);
+    updateIntron();
+    writeIntron();
+
+    writeCheckSum(outfile);
     outfile.close();
+    completeProgress();
+    printf("Done: %s => %s !\n", infileName, outFileName);
+
     infile.close();
-    printf("\nDone : %s => %s !\n", ifile, ofile);
-    do {
-        printf("Do you want to delete %s ?(y/n)\n", ifile);
-        gval(c);
-    } while (c != 'y' && c != 'Y' && c != 'n' && c != 'N');
-    if (c == 'y' || c == 'Y') {
-        remove(ifile);
+    if (userPromptWithArg("Do you want to delete", infileName) == 'y') {
+        remove(infileName);
     }
+
     return 0;
 }

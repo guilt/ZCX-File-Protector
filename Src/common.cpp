@@ -3,104 +3,104 @@
 
 extern "C" {
 
-void operationOne(long_t plen, char *passwd) {
+void operationOne(long_t passwordLength, char *passwd) {
     long_t j, l;
-    for (j = 0; j < plen; j++) {
-        l = j % KEYLENGTHSIZE;
-        passwd[j] = passwd[j] ^ ftable[atable[l] - 1];
-        passwd[j] = passwd[j] - etable[btable[l] - 1];
-        passwd[j] = passwd[j] ^ dtable[ctable[l] - 1];
-        passwd[j] = passwd[j] + gtable[table[l] - 1];
+    for (j = 0; j < passwordLength; j++) {
+        l = j % KEY_LENGTH_SIZE;
+        passwd[j] = passwd[j] ^ fTable[aKPTable[l] - 1];
+        passwd[j] = passwd[j] - eTable[bKPTable[l] - 1];
+        passwd[j] = passwd[j] ^ dTable[cKPTable[l] - 1];
+        passwd[j] = passwd[j] + gTable[_KPTable[l] - 1];
     }
 }
 
 
-void operationTwo(long_t plen, char *passwdc) {
+void operationTwo(long_t passwordLength, char *passwordCiphered) {
     long_t j, l;
-    for (j = 0; j < plen; j++) {
-        l = j % KEYLENGTHSIZE;
-        passwdc[j] = passwdc[j] - gtable[table[l] - 1];
-        passwdc[j] = passwdc[j] ^ dtable[ctable[l] - 1];
-        passwdc[j] = passwdc[j] + etable[btable[l] - 1];
-        passwdc[j] = passwdc[j] ^ ftable[atable[l] - 1];
+    for (j = 0; j < passwordLength; j++) {
+        l = j % KEY_LENGTH_SIZE;
+        passwordCiphered[j] = passwordCiphered[j] - gTable[_KPTable[l] - 1];
+        passwordCiphered[j] = passwordCiphered[j] ^ dTable[cKPTable[l] - 1];
+        passwordCiphered[j] = passwordCiphered[j] + eTable[bKPTable[l] - 1];
+        passwordCiphered[j] = passwordCiphered[j] ^ fTable[aKPTable[l] - 1];
     }
 }
 
-void operationThree(long_t plen, const char *passwdc) {
+void operationThree(long_t passwordLength, const char *passwordCiphered) {
     long_t j, l;
-    for (j = 0; j < plen; j++) {
-        l = j % KEYLENGTHSIZE;
-        cotable[l] = cotable[l] + passwdc[j];
-        cotable[l] = cotable[l] ^ passwdc[j];
-        cotable[l] = cotable[l] - passwdc[j];
-        cotable[l] = cotable[l] ^ passwdc[j];
+    for (j = 0; j < passwordLength; j++) {
+        l = j % KEY_LENGTH_SIZE;
+        coTable[l] = coTable[l] + passwordCiphered[j];
+        coTable[l] = coTable[l] ^ passwordCiphered[j];
+        coTable[l] = coTable[l] - passwordCiphered[j];
+        coTable[l] = coTable[l] ^ passwordCiphered[j];
     }
 }
 
-void operationFour(long_t fnlen, char *ofile) {
+void operationFour(long_t fileNameLength, char *outputFileName) {
     long_t j, l;
-    for (j = 0; j < fnlen; j++) {
-        l = j % KEYLENGTHSIZE;
-        ofile[j] = ofile[j] ^ ftable[table[l] - 1];
-        ofile[j] = ofile[j] + gtable[ctable[l] - 1];
-        ofile[j] = ofile[j] ^ dtable[btable[l] - 1];
-        ofile[j] = ofile[j] - etable[atable[l] - 1];
+    for (j = 0; j < fileNameLength; j++) {
+        l = j % KEY_LENGTH_SIZE;
+        outputFileName[j] = outputFileName[j] ^ fTable[_KPTable[l] - 1];
+        outputFileName[j] = outputFileName[j] + gTable[cKPTable[l] - 1];
+        outputFileName[j] = outputFileName[j] ^ dTable[bKPTable[l] - 1];
+        outputFileName[j] = outputFileName[j] - eTable[aKPTable[l] - 1];
     }
 }
 
-void operationFive(long_t fnlen, char *ifile) {
+void operationFive(long_t fileNameLength, char *inputFileName) {
     long_t j, l;
-    for (j = 0; j < fnlen; j++) {
-        l = j % KEYLENGTHSIZE;
-        ifile[j] = ifile[j] + etable[atable[l] - 1];
-        ifile[j] = ifile[j] ^ dtable[btable[l] - 1];
-        ifile[j] = ifile[j] - gtable[ctable[l] - 1];
-        ifile[j] = ifile[j] ^ ftable[table[l] - 1];
+    for (j = 0; j < fileNameLength; j++) {
+        l = j % KEY_LENGTH_SIZE;
+        inputFileName[j] = inputFileName[j] + eTable[aKPTable[l] - 1];
+        inputFileName[j] = inputFileName[j] ^ dTable[bKPTable[l] - 1];
+        inputFileName[j] = inputFileName[j] - gTable[cKPTable[l] - 1];
+        inputFileName[j] = inputFileName[j] ^ fTable[_KPTable[l] - 1];
     }
 }
 
-void operationSix(long_t plen, unsigned char *array) {
+void operationSix(long_t keyLength, unsigned char *array) {
     long_t j;
-    for (j = 0; j < plen; j++) {
+    for (j = 0; j < keyLength; j++) {
         char b = array[j];
-        array[j] = array[j] ^ cotable[j];
-        array[j] = array[j] - cotable[j];
-        array[j] = array[j] ^ cotable[j];
-        array[j] = array[j] + cotable[j];
-        array[j] = array[j] ^ dtable[table[j] - 1];
-        array[j] = array[j] + etable[ctable[j] - 1];
-        array[j] = array[j] ^ ftable[btable[j] - 1];
-        array[j] = array[j] - gtable[atable[j] - 1];
-        array[j] = array[j] ^ uptable[j];
-        array[j] = array[j] - uptable[j];
-        array[j] = array[j] ^ uptable[j];
-        array[j] = array[j] + uptable[j];
-        uptable[j] = uptable[j] + b;
-        uptable[j] = uptable[j] ^ b;
-        uptable[j] = uptable[j] - b;
-        uptable[j] = uptable[j] ^ b;
+        array[j] = array[j] ^ coTable[j];
+        array[j] = array[j] - coTable[j];
+        array[j] = array[j] ^ coTable[j];
+        array[j] = array[j] + coTable[j];
+        array[j] = array[j] ^ dTable[_KPTable[j] - 1];
+        array[j] = array[j] + eTable[cKPTable[j] - 1];
+        array[j] = array[j] ^ fTable[bKPTable[j] - 1];
+        array[j] = array[j] - gTable[aKPTable[j] - 1];
+        array[j] = array[j] ^ upTable[j];
+        array[j] = array[j] - upTable[j];
+        array[j] = array[j] ^ upTable[j];
+        array[j] = array[j] + upTable[j];
+        upTable[j] = upTable[j] + b;
+        upTable[j] = upTable[j] ^ b;
+        upTable[j] = upTable[j] - b;
+        upTable[j] = upTable[j] ^ b;
     }
 }
 
-void operationSeven(long_t plen, unsigned char *array) {
+void operationSeven(long_t keyLength, unsigned char *array) {
     long_t j;
-    for (j = 0; j < plen; j++) {
-        array[j] = array[j] - uptable[j];
-        array[j] = array[j] ^ uptable[j];
-        array[j] = array[j] + uptable[j];
-        array[j] = array[j] ^ uptable[j];
-        array[j] = array[j] + gtable[atable[j] - 1];
-        array[j] = array[j] ^ ftable[btable[j] - 1];
-        array[j] = array[j] - etable[ctable[j] - 1];
-        array[j] = array[j] ^ dtable[table[j] - 1];
-        array[j] = array[j] - cotable[j];
-        array[j] = array[j] ^ cotable[j];
-        array[j] = array[j] + cotable[j];
-        array[j] = array[j] ^ cotable[j];
-        uptable[j] = uptable[j] + array[j];
-        uptable[j] = uptable[j] ^ array[j];
-        uptable[j] = uptable[j] - array[j];
-        uptable[j] = uptable[j] ^ array[j];
+    for (j = 0; j < keyLength; j++) {
+        array[j] = array[j] - upTable[j];
+        array[j] = array[j] ^ upTable[j];
+        array[j] = array[j] + upTable[j];
+        array[j] = array[j] ^ upTable[j];
+        array[j] = array[j] + gTable[aKPTable[j] - 1];
+        array[j] = array[j] ^ fTable[bKPTable[j] - 1];
+        array[j] = array[j] - eTable[cKPTable[j] - 1];
+        array[j] = array[j] ^ dTable[_KPTable[j] - 1];
+        array[j] = array[j] - coTable[j];
+        array[j] = array[j] ^ coTable[j];
+        array[j] = array[j] + coTable[j];
+        array[j] = array[j] ^ coTable[j];
+        upTable[j] = upTable[j] + array[j];
+        upTable[j] = upTable[j] ^ array[j];
+        upTable[j] = upTable[j] - array[j];
+        upTable[j] = upTable[j] ^ array[j];
     }
 }
 

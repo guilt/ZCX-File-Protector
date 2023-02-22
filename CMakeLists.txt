@@ -6,6 +6,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Bin")
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Lib") 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Lib")
 
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+ set(LINUX ON)
+endif()
+
 if(WIN32)
   # See https://blog.kitware.com/create-dlls-on-windows-without-declspec-using-new-cmake-export-all-feature/
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
@@ -16,10 +20,14 @@ elseif(APPLE)
   add_definitions(-DIAPPLE)
   # Dynamic Link Libc
   set(CMAKE_EXE_LINKER_FLAGS "")
-else(WIN32)
+elseif(LINUX)
   add_definitions(-DILIN)
   # Static Link GCC
   set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc -static-libstdc++")
+elseif(UNIX)
+  add_definitions(-DIUNI)
+  # Static Link GCC
+  set(CMAKE_EXE_LINKER_FLAGS "")
 endif(WIN32)
 
 # Include Directories
@@ -35,7 +43,7 @@ set(APP_ENCOM ${PROJECT_NAME}-Encom)
 set(APP_ENCOM_SOURCES ${LIB_SOURCES} Src/encom.cpp)
 
 set(APP_DECOM ${PROJECT_NAME}-Decom)
-set(APP_DECOM_SOURCES ${LIB_SOURCES} Src/decom.cpp)
+set(APP_DECOM_SOURCES ${LIB_SOURCES} Src/decom.cpp Src/fileinp.h)
 
 # shared library
 add_library(${LIB_NAME} STATIC ${LIB_SOURCES})

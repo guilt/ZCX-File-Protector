@@ -8,31 +8,34 @@
 
 extern "C" {
 // Intron Table
-extern unsigned char itable[TABLESIZE];
-extern unsigned char ditable[TABLESIZE];
+extern unsigned char intronTable[KEY_LENGTH_SIZE_WITH_ZERO];
+extern unsigned char decodeIntronTable[KEY_LENGTH_SIZE_WITH_ZERO];
 
-extern long_t factor;
-extern long_t bfactor;
-extern long_t icount;
+extern long_t keyFactor;
+extern long_t intronFactor;
+extern long_t intronCounter;
 }
 
-#define bfainit() bfactor = ((plen * fnlen) + 1)
-#define wintron()                                            \
-  if ((icount % bfactor) == 0) {                             \
-    outfile.write((char *)itable, (plen + icount) % factor); \
+#define initializeIntron(passwordLength, fileNameLength) { intronFactor = ((passwordLength * fileNameLength) + 1); }
+
+#define writeIntron()                                            \
+  if ((intronCounter % intronFactor) == 0) {                             \
+    outfile.write((char *)intronTable, (passwordLength + intronCounter) % keyFactor); \
   }
-#define rintron()                                           \
-  if ((icount % bfactor) == 0) {                            \
-    infile.read((char *)ditable, (plen + icount) % factor); \
+
+#define readIntron()                                           \
+  if ((intronCounter % intronFactor) == 0) {                            \
+    infile.read((char *)decodeIntronTable, (passwordLength + intronCounter) % keyFactor); \
   }
-#define docount() icount++
+
+#define updateIntron() intronCounter++
 
 #else //USE_INTRON
 
-#define bfainit()
-#define wintron()
-#define rintron()
-#define docount()
+#define initializeIntron()
+#define writeIntron()
+#define readIntron()
+#define updateIntron()
 
 #endif //USE_INTRON
 

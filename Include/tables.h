@@ -5,21 +5,21 @@
 
 extern "C" {
 //Checksum Updation Table
-extern unsigned char uptable[TABLESIZE];
+extern unsigned char upTable[KEY_LENGTH_SIZE_WITH_ZERO];
 // Co - Table
-extern unsigned char cotable[TABLESIZE];
+extern unsigned char coTable[KEY_LENGTH_SIZE_WITH_ZERO];
 
 // Key Position Tables
-extern unsigned char table[TABLESIZE];
-extern unsigned char atable[TABLESIZE];
-extern unsigned char btable[TABLESIZE];
-extern unsigned char ctable[TABLESIZE];
+extern unsigned char _KPTable[KEY_LENGTH_SIZE_WITH_ZERO];
+extern unsigned char aKPTable[KEY_LENGTH_SIZE_WITH_ZERO];
+extern unsigned char bKPTable[KEY_LENGTH_SIZE_WITH_ZERO];
+extern unsigned char cKPTable[KEY_LENGTH_SIZE_WITH_ZERO];
 
 // Key Tables
-extern unsigned char dtable[KEYSARRAYSIZE];
-extern unsigned char etable[KEYSARRAYSIZE];
-extern unsigned char ftable[KEYSARRAYSIZE];
-extern unsigned char gtable[KEYSARRAYSIZE];
+extern unsigned char dTable[KEY_ARRAY_SIZE];
+extern unsigned char eTable[KEY_ARRAY_SIZE];
+extern unsigned char fTable[KEY_ARRAY_SIZE];
+extern unsigned char gTable[KEY_ARRAY_SIZE];
 }
 
 #endif //ZCX_TABLES_H

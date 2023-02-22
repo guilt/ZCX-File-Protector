@@ -1,6 +1,5 @@
-build
-build-*
-cmake-*
+[Bb]uild*
+[Cc]make-*
 
 .idea
 .DS_Store
@@ -9,3 +8,12 @@ __.*
 *.zcx
 *.sh
 *.tmp
+
+*.o
+*.a
+*.out
+
+*.obj
+*.lib
+*.dll
+*.exe

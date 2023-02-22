@@ -5,24 +5,24 @@
 #define AUTHOR "Karthik Kumar Viswanathan <karthikkumar@gmail.com>"
 
 // For a Blazing 512-Bit Block ZCX Encryption
-#define KEYLENGTHSIZE 64
-#define KEYSARRAYSIZE 32
-#define TABLESIZE 65
-#define FILENAMELENGTH 512
+#define MIN_KEY_LENGTH_SIZE 8
+#define KEY_ARRAY_SIZE 32
+#define KEY_LENGTH_SIZE 64
+#define KEY_LENGTH_SIZE_WITH_ZERO (KEY_LENGTH_SIZE+1)
 
-#define DEFAULT_FILE "fpcoded.zcx"
+#define FILENAME_LENGTH 512
+
+#define DEFAULT_FILE "FPCODED.ZCX"
 
 #if defined(IDOS) || defined(IUNI)
+
 #define long_t long
-#else
+
+#else //defined(IDOS) || defined(IUNI)
 
 #include <stdint.h>
 
-#ifdef int32_t
 #define long_t int32_t
-#else
-#define long_t long
-#endif //int32_t
 
 #endif //defined(IDOS) || defined(IUNI)
 
