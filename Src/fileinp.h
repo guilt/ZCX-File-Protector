@@ -5,12 +5,12 @@
 #ifndef ZCX_FILEINP_H
 #define ZCX_FILEINP_H
 
-#if defined(IDOS)
+#if defined(IDOS) && !defined(__GNUC__)
 #include <fstream.h>
-#else // defined(IDOS)
+#else // defined(IDOS) && !defined(__GNUC__)
 #include <fstream>
 using namespace std;
-#endif // defined(IDOS)
+#endif // defined(IDOS) && !defined(__GNUC__)
 
 #if defined(IUNI)
 #define ios_binary 0
