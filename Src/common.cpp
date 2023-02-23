@@ -41,25 +41,6 @@ extern "C"
 #endif // defined(DEBUG)
     }
 
-    void operationTwo(long_t passwordLength, char* passwordCiphered)
-    {
-        long_t j, l;
-        U_S_unroll(j, passwordLength, {
-            l = j % KEY_LENGTH_SIZE;
-            passwordCiphered[j] =
-                passwordCiphered[j] - gTable[_KPTable[l] - 1];
-            passwordCiphered[j] = passwordCiphered[j] ^
-                dTable[cKPTable[l] - 1];
-            passwordCiphered[j] =
-                passwordCiphered[j] + eTable[bKPTable[l] - 1];
-            passwordCiphered[j] = passwordCiphered[j] ^
-                fTable[aKPTable[l] - 1];
-        });
-#if defined(DEBUG)
-        printArray("passwordCiphered", passwordCiphered, passwordLength);
-#endif // defined(DEBUG)
-    }
-
     void operationThree(long_t passwordLength, const char* passwordCiphered)
     {
         long_t j, l;

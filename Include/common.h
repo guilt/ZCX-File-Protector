@@ -11,7 +11,6 @@ extern "C"
 #endif // defined(DEBUG)
 
     extern void operationOne(long_t passwordLength, char* passwd);
-    extern void operationTwo(long_t passwordLength, char* passwordCiphered);
     extern void operationThree(long_t passwordLength,
                                const char* passwordCiphered);
 

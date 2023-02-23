@@ -32,6 +32,7 @@ long_t getPasswordFromFile(ifstream& infile,
     blockRead(passwordCipheredLength, sizeof(long_t), infile);
     blockReadPtr(passwdCiphered, passwordCipheredLength, infile);
 
+    operationThree(passwordLength, passwd);
     operationOne(passwordLength, passwd);
 
     // TODO: Eliminate this Check. Make Wrong Passwords Costly.
@@ -41,9 +42,6 @@ long_t getPasswordFromFile(ifstream& infile,
         printError("\nSorry, Probably Wrong Password!\n");
         return -1;
     }
-
-    operationTwo(passwordLength, passwdCiphered);
-    operationThree(passwordLength, passwdCiphered);
 
     return passwordLength;
 }
