@@ -107,7 +107,7 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     fileNameLength = getFileNameFromFile(infile, outfileName);
 
     blockRead(fileLength, sizeof(long_t), infile);
-    printf("File Length: %ld\n", fileLength);
+    printf("File Length: %ld\n", (long_t)fileLength);
 
     outfile.open(outfileName, ios::out | ios_binary);
     if (!outfile) {

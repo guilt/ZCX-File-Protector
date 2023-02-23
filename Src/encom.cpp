@@ -78,7 +78,7 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     getPasswordWithConfirmation(passwd);
 
     getFileLength(fileLength, infile);
-    printf("File Length: %ld\n", fileLength);
+    printf("File Length: %ld\n", (long_t)fileLength);
 
     outfile.open(outFileName, ios::out | ios_binary);
     if (!outfile) {

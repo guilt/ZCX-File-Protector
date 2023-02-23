@@ -11,7 +11,7 @@ extern "C" {
 void printArray(const char *arrayName, void *array, long_t length) {
     long_t i;
     unsigned char *charArray = (unsigned char *)array;
-    printf("DEBUG: [printArray] %s[%d]: ", arrayName);
+    printf("DEBUG: [printArray] %s[%d]: ", arrayName, length);
     for(i = 0; i < length; ++i) {
         printf("%0x2d", charArray[i]);
     }
