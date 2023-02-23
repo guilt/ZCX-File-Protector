@@ -31,14 +31,13 @@
 //
 // We have 4 variants of Unrolling.
 //
-// U_unroll makes i go 0 to length-1 in exponential steps
-// U_S_unroll makes i go 0 to length-1 in single steps
+// U_unroll makes i go up 0 to length-1 in exponential steps.
+// U_S_unroll makes i go up 0 to length-1 in single steps.
 //
-// D_unroll makes i go length to 1 in exponential steps
-// D_S_unroll makes i go length to 1 in single steps
+// D_unroll makes i go down length to 1 in exponential steps.
+// D_S_unroll makes i go down length to 1 in single steps.
 
-// Unit Macros. Overwrite if you have a different
-// or a better replacement for these.
+// Unit Macros. Overwrite if you have a better replacement.
 #ifndef _unroll1
 #define _unroll1(x) \
     {               \
