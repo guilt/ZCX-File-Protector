@@ -8,10 +8,9 @@
 
 extern "C" {
 // Intron Table
-extern unsigned char intronTable[KEY_LENGTH_SIZE_WITH_ZERO];
-extern unsigned char decodeIntronTable[KEY_LENGTH_SIZE_WITH_ZERO];
+extern unsigned char intronTable[KEY_LENGTH_SIZE];
+extern unsigned char decodeIntronTable[KEY_LENGTH_SIZE];
 
-extern long_t keyFactor;
 extern long_t intronFactor;
 extern long_t intronCounter;
 }
@@ -23,14 +22,14 @@ extern long_t intronCounter;
 
 #define writeIntron()                                                                \
   if ((intronCounter % intronFactor) == 0) {                                         \
-    long_t intronLength = (passwordLength + intronCounter) % keyFactor;              \
+    long_t intronLength = (passwordLength + intronCounter) % KEY_LENGTH_SIZE;        \
     printf("DEBUG: [Intron] Writing: %d Bytes\n", intronLength);                     \
     outfile.write((char *)intronTable, intronLength);                                \
   }
 
 #define readIntron()                                                                 \
   if ((intronCounter % intronFactor) == 0) {                                         \
-    long_t intronLength = (passwordLength + intronCounter) % keyFactor;              \
+    long_t intronLength = (passwordLength + intronCounter) % KEY_LENGTH_SIZE;        \
     printf("DEBUG: [Intron] Reading: %d Bytes\n", intronLength);                     \
     infile.read((char *)decodeIntronTable, intronLength);                            \
   }
@@ -39,13 +38,13 @@ extern long_t intronCounter;
 
 #define writeIntron()                                                                \
   if ((intronCounter % intronFactor) == 0) {                                         \
-    long_t intronLength = (passwordLength + intronCounter) % keyFactor;              \
+    long_t intronLength = (passwordLength + intronCounter) % KEY_LENGTH_SIZE;        \
     outfile.write((char *)intronTable, intronLength);                                \
   }
 
 #define readIntron()                                                                 \
   if ((intronCounter % intronFactor) == 0) {                                         \
-    long_t intronLength = (passwordLength + intronCounter) % keyFactor;              \
+    long_t intronLength = (passwordLength + intronCounter) % KEY_LENGTH_SIZE;        \
     infile.read((char *)decodeIntronTable, intronLength);                            \
   }
 

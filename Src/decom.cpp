@@ -70,10 +70,10 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     long_t i, numberOfBlocks, extraSpace;
     long_t passwordLength, fileNameLength, fileLength;
 
-    char passwd[KEY_LENGTH_SIZE_WITH_ZERO];
-    unsigned char array[KEY_LENGTH_SIZE_WITH_ZERO];
-
+    unsigned char array[KEY_LENGTH_SIZE];
     char infileName[FILENAME_LENGTH], outfileName[FILENAME_LENGTH];
+
+    char passwd[KEY_LENGTH_SIZE_WITH_ZERO];
 
     ifstream infile;
     ofstream outfile;

@@ -7,11 +7,13 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Lib")
 
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
- set(LINUX ON)
+  set(LINUX ON)
 endif()
 
 # Enable Full-Fledged Debugging
-add_definitions(-DDEBUG)
+if(CMAKE_BUILD_TYPE MATCHES DEBUG)
+  add_definitions(-DDEBUG)
+endif()
 
 if(WIN32)
   # See https://blog.kitware.com/create-dlls-on-windows-without-declspec-using-new-cmake-export-all-feature/

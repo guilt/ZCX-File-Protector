@@ -13,7 +13,8 @@ void printArray(const char *arrayName, void *array, long_t length) {
     unsigned char *charArray = (unsigned char *)array;
     printf("DEBUG: [printArray] %s[%d]: ", arrayName, length);
     for(i = 0; i < length; ++i) {
-        printf("%0x2d", charArray[i]);
+        printf("%02x", charArray[i]);
+        if((i&3) == 3) printf(" ");
     }
     printf("\n");
 }
