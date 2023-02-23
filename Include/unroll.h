@@ -39,384 +39,378 @@
 
 // Unit Macros. Overwrite if you have a different
 // or a better replacement for these.
-#ifndef perform1
-#define perform1(x) \
+#ifndef _unroll1
+#define _unroll1(x) \
     {               \
         x;          \
     }
-#endif // perform1
+#endif // _unroll1
 
-#ifndef perform2
-#define perform2(x) \
-    perform1(x);    \
-    perform1(x)
-#endif // perform2
+#ifndef _unroll2
+#define _unroll2(x) \
+    _unroll1(x);    \
+    _unroll1(x)
+#endif // _unroll2
 
-#ifndef perform4
-#define perform4(x) \
-    perform2(x);    \
-    perform2(x)
-#endif // perform4
+#ifndef _unroll4
+#define _unroll4(x) \
+    _unroll2(x);    \
+    _unroll2(x)
+#endif // _unroll4
 
-#ifndef perform8
-#define perform8(x) \
-    perform4(x);    \
-    perform4(x)
-#endif // perform8
+#ifndef _unroll8
+#define _unroll8(x) \
+    _unroll4(x);    \
+    _unroll4(x)
+#endif // _unroll8
 
-#ifndef perform16
-#define perform16(x) \
-    perform8(x);     \
-    perform8(x)
-#endif // perform16
+#ifndef _unroll16
+#define _unroll16(x) \
+    _unroll8(x);     \
+    _unroll8(x)
+#endif // _unroll16
 
-#ifndef perform32
-#define perform32(x) \
-    perform16(x);    \
-    perform16(x)
-#endif // perform32
+#ifndef _unroll32
+#define _unroll32(x) \
+    _unroll16(x);    \
+    _unroll16(x)
+#endif // _unroll32
 
-#ifndef perform64
-#define perform64(x) \
-    perform32(x);    \
-    perform32(x)
-#endif // perform64
+#ifndef _unroll64
+#define _unroll64(x) \
+    _unroll32(x);    \
+    _unroll32(x)
+#endif // _unroll64
 
-#ifndef perform128
-#define perform128(x) \
-    perform64(x);     \
-    perform64(x)
-#endif // perform128
-
-// Unset on Debug Mode.
-#ifdef DEBUG
-#undef rest
-#define rest 1
-#endif // DEBUG
+#ifndef _unroll128
+#define _unroll128(x) \
+    _unroll64(x);     \
+    _unroll64(x)
+#endif // _unroll128
 
 // Set Unrolling level.
 // Set to 8 by default.
-#ifndef rest
-#define rest 8
-#endif // rest
+#ifndef unrollLevel
+#define unrollLevel 8
+#endif // unrollLevel
 
-// Set Perform Rest.
-#if (rest >= 128)
-#define performrest perform128
-#elif (rest >= 64)
-#define performrest perform64
-#elif (rest >= 32)
-#define performrest perform32
-#elif (rest >= 16)
-#define performrest perform16
-#elif (rest >= 8)
-#define performrest perform8
-#elif (rest >= 4)
-#define performrest perform4
-#elif (rest >= 2)
-#define performrest perform2
-#elif (rest >= 1)
-#define performrest perform1
+// Set _unroll unrollLevel.
+#if (unrollLevel >= 128)
+#define _unrollRest _unroll128
+#elif (unrollLevel >= 64)
+#define _unrollRest _unroll64
+#elif (unrollLevel >= 32)
+#define _unrollRest _unroll32
+#elif (unrollLevel >= 16)
+#define _unrollRest _unroll16
+#elif (unrollLevel >= 8)
+#define _unrollRest _unroll8
+#elif (unrollLevel >= 4)
+#define _unrollRest _unroll4
+#elif (unrollLevel >= 2)
+#define _unrollRest _unroll2
+#elif (unrollLevel >= 1)
+#define _unrollRest _unroll1
 #else
-#error rest should be at least 1.
-#endif //(rest >= 128)
+#error unrollLevel should be at least 1.
+#endif //(unrollLevel >= 128)
 
 // Set Availability.
-#if (rest >= 1)
-#define avail1
-#endif //(rest >= 1)
-#if (rest >= 2)
-#define avail2
-#endif //(rest >= 2)
-#if (rest >= 4)
-#define avail4
-#endif //(rest >= 4)
-#if (rest >= 8)
-#define avail8
-#endif //(rest >= 8)
-#if (rest >= 16)
-#define avail16
-#endif //(rest >= 16)
-#if (rest >= 32)
-#define avail32
-#endif //(rest >= 32)
-#if (rest >= 64)
-#define avail64
-#endif //(rest >= 64)
-#if (rest >= 128)
-#define avail128
-#endif //(rest >= 128)
+#if (unrollLevel >= 1)
+#define _avail1
+#endif //(unrollLevel >= 1)
+#if (unrollLevel >= 2)
+#define _avail2
+#endif //(unrollLevel >= 2)
+#if (unrollLevel >= 4)
+#define _avail4
+#endif //(unrollLevel >= 4)
+#if (unrollLevel >= 8)
+#define _avail8
+#endif //(unrollLevel >= 8)
+#if (unrollLevel >= 16)
+#define _avail16
+#endif //(unrollLevel >= 16)
+#if (unrollLevel >= 32)
+#define _avail32
+#endif //(unrollLevel >= 32)
+#if (unrollLevel >= 64)
+#define _avail64
+#endif //(unrollLevel >= 64)
+#if (unrollLevel >= 128)
+#define _avail128
+#endif //(unrollLevel >= 128)
 
-// Perform Task Macros.
-#ifdef avail1
+// _unroll Task Macros.
+#ifdef _avail1
 #define D_1(v, n, x) \
     if (v & 1)       \
     {                \
-        perform1(x); \
+        _unroll1(x); \
         v -= 1;      \
     }
 #define D_S_1(v, n, x)       \
     if (v & 1)               \
     {                        \
-        perform1(x; v -= 1); \
+        _unroll1(x; v -= 1); \
     }
 #define U_1(v, n, x) \
     if ((n - v) & 1) \
     {                \
-        perform1(x); \
+        _unroll1(x); \
         v += 1;      \
     }
 #define U_S_1(v, n, x)       \
     if ((n - v) & 1)         \
     {                        \
-        perform1(x; v += 1); \
+        _unroll1(x; v += 1); \
     }
 #else
 #define D_1(v, n, x)
 #define D_S_1(v, n, x)
 #define U_1(v, n, x)
 #define U_S_1(v, n, x)
-#endif // avail1
+#endif // _avail1
 
-#ifdef avail2
+#ifdef _avail2
 #define D_2(v, n, x) \
     if (v & 2)       \
     {                \
-        perform2(x); \
+        _unroll2(x); \
         v -= 2;      \
     }
 #define D_S_2(v, n, x)       \
     if (v & 2)               \
     {                        \
-        perform2(x; v -= 1); \
+        _unroll2(x; v -= 1); \
     }
 #define U_2(v, n, x) \
     if ((n - v) & 2) \
     {                \
-        perform2(x); \
+        _unroll2(x); \
         v += 2;      \
     }
 #define U_S_2(v, n, x)       \
     if ((n - v) & 2)         \
     {                        \
-        perform2(x; v += 1); \
+        _unroll2(x; v += 1); \
     }
 #else
 #define D_2(v, n, x)
 #define D_S_2(v, n, x)
 #define U_2(v, n, x)
 #define U_S_2(v, n, x)
-#endif // avail2
+#endif // _avail2
 
-#ifdef avail4
+#ifdef _avail4
 #define D_4(v, n, x) \
     if (v & 4)       \
     {                \
-        perform4(x); \
+        _unroll4(x); \
         v -= 4;      \
     }
 #define D_S_4(v, n, x)       \
     if (v & 4)               \
     {                        \
-        perform4(x; v -= 1); \
+        _unroll4(x; v -= 1); \
     }
 #define U_4(v, n, x) \
     if ((n - v) & 4) \
     {                \
-        perform4(x); \
+        _unroll4(x); \
         v += 4;      \
     }
 #define U_S_4(v, n, x)       \
     if ((n - v) & 4)         \
     {                        \
-        perform4(x; v += 1); \
+        _unroll4(x; v += 1); \
     }
 #else
 #define D_4(v, n, x)
 #define D_S_4(v, n, x)
 #define U_4(v, n, x)
 #define U_S_4(v, n, x)
-#endif // avail4
+#endif // _avail4
 
-#ifdef avail8
+#ifdef _avail8
 #define D_8(v, n, x) \
     if (v & 8)       \
     {                \
-        perform8(x); \
+        _unroll8(x); \
         v -= 8;      \
     }
 #define D_S_8(v, n, x)       \
     if (v & 8)               \
     {                        \
-        perform8(x; v -= 1); \
+        _unroll8(x; v -= 1); \
     }
 #define U_8(v, n, x) \
     if ((n - v) & 8) \
     {                \
-        perform8(x); \
+        _unroll8(x); \
         v += 8;      \
     }
 #define U_S_8(v, n, x)       \
     if ((n - v) & 8)         \
     {                        \
-        perform8(x; v += 1); \
+        _unroll8(x; v += 1); \
     }
 #else
 #define D_8(v, n, x)
 #define D_S_8(v, n, x)
 #define U_8(v, n, x)
 #define U_S_8(v, n, x)
-#endif // avail8
+#endif // _avail8
 
-#ifdef avail16
+#ifdef _avail16
 #define D_16(v, n, x) \
     if (v & 16)       \
     {                 \
-        perform16(x); \
+        _unroll16(x); \
         v -= 16;      \
     }
 #define D_S_16(v, n, x)       \
     if (v & 16)               \
     {                         \
-        perform16(x; v -= 1); \
+        _unroll16(x; v -= 1); \
     }
 #define U_16(v, n, x) \
     if ((n - v) & 16) \
     {                 \
-        perform16(x); \
+        _unroll16(x); \
         v += 16;      \
     }
 #define U_S_16(v, n, x)       \
     if ((n - v) & 16)         \
     {                         \
-        perform16(x; v += 1); \
+        _unroll16(x; v += 1); \
     }
 #else
 #define D_16(v, n, x)
 #define D_S_16(v, n, x)
 #define U_16(v, n, x)
 #define U_S_16(v, n, x)
-#endif // avail16
+#endif // _avail16
 
-#ifdef avail32
+#ifdef _avail32
 #define D_32(v, n, x) \
     if (v & 32)       \
     {                 \
-        perform32(x); \
+        _unroll32(x); \
         v -= 32;      \
     }
 #define D_S_32(v, n, x)       \
     if (v & 32)               \
     {                         \
-        perform32(x; v -= 1); \
+        _unroll32(x; v -= 1); \
     }
 #define U_32(v, n, x) \
     if ((n - v) & 32) \
     {                 \
-        perform32(x); \
+        _unroll32(x); \
         v += 32;      \
     }
 #define U_S_32(v, n, x)       \
     if ((n - v) & 32)         \
     {                         \
-        perform32(x; v += 1); \
+        _unroll32(x; v += 1); \
     }
 #else
 #define D_32(v, n, x)
 #define D_S_32(v, n, x)
 #define U_32(v, n, x)
 #define U_S_32(v, n, x)
-#endif // avail32
+#endif // _avail32
 
-#ifdef avail64
+#ifdef _avail64
 #define D_64(v, n, x) \
     if (v & 64)       \
     {                 \
-        perform64(x); \
+        _unroll64(x); \
         v -= 64;      \
     }
 #define D_S_64(v, n, x)       \
     if (v & 64)               \
     {                         \
-        perform64(x; v -= 1); \
+        _unroll64(x; v -= 1); \
     }
 #define U_64(v, n, x) \
     if ((n - v) & 64) \
     {                 \
-        perform64(x); \
+        _unroll64(x); \
         v += 64;      \
     }
 #define U_S_64(v, n, x)       \
     if ((n - v) & 64)         \
     {                         \
-        perform64(x; v += 1); \
+        _unroll64(x; v += 1); \
     }
 #else
 #define D_64(v, n, x)
 #define D_S_64(v, n, x)
 #define U_64(v, n, x)
 #define U_S_64(v, n, x)
-#endif // avail64
+#endif // _avail64
 
-#ifdef avail128
+#ifdef _avail128
 #define D_128(v, n, x) \
     if (v & 128)       \
     {                  \
-        perform128(x); \
+        _unroll128(x); \
         v -= 128;      \
     }
 #define D_S_128(v, n, x)       \
     if (v & 128)               \
     {                          \
-        perform128(x; v -= 1); \
+        _unroll128(x; v -= 1); \
     }
 #define U_128(v, n, x) \
     if ((n - v) & 128) \
     {                  \
-        perform128(x); \
+        _unroll128(x); \
         v += 128;      \
     }
 #define U_S_128(v, n, x)       \
     if ((n - v) & 128)         \
     {                          \
-        perform128(x; v += 1); \
+        _unroll128(x; v += 1); \
     }
 #else
 #define D_128(v, n, x)
 #define D_S_128(v, n, x)
 #define U_128(v, n, x)
 #define U_S_128(v, n, x)
-#endif // avail128
+#endif // _avail128
 
-#ifdef performrest
-#define D_rest(v, n, x) \
-    while (v)           \
-    {                   \
-        performrest(x); \
-        v -= rest;      \
+#ifdef _unrollRest
+#define D_rest(v, n, x)         \
+    while (v)                   \
+    {                           \
+        _unrollRest(x);         \
+        v -= unrollLevel;       \
     }
 #define D_S_rest(v, n, x)       \
     while (v)                   \
     {                           \
-        performrest(x; v -= 1); \
+        _unrollRest(x; v -= 1); \
     }
-#define U_rest(v, n, x) \
-    while (n - v)       \
-    {                   \
-        performrest(x); \
-        v += rest;      \
+#define U_rest(v, n, x)         \
+    while (n - v)               \
+    {                           \
+        _unrollRest(x);         \
+        v += unrollLevel;       \
     }
 #define U_S_rest(v, n, x)       \
     while (n - v)               \
     {                           \
-        performrest(x; v += 1); \
+        _unrollRest(x; v += 1); \
     }
 #else
 #define D_rest(v, n, x)
 #define D_S_rest(v, n, x)
 #define U_rest(v, n, x)
 #define U_S_rest(v, n, x)
-#endif // performrest
+#endif // _unrollRest
 
 //  D_unroll(v, n, x); Performs: x; n times. v goes from n to 1
 //  exponentially. x shouldn't try to access v.
