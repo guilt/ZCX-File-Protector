@@ -1,24 +1,29 @@
 // Decryption
-#include "constant.h"
 #include "common.h"
-#include "tables.h"
-#include "intron.h"
-#include "userinp.h"
+#include "constant.h"
 #include "fileinp.h"
+#include "intron.h"
+#include "tables.h"
+#include "userinp.h"
 
-int getHeaderFromFile(ifstream &infile) {
+int getHeaderFromFile(ifstream& infile)
+{
     char header[2];
 
     blockReadPtr(header, 2, infile);
-    if (header[0] != 'E' || header[1] != 'F') {
-        printError("\nInvalid Header. Not a Proper Encrypted File!\n");
+    if (header[0] != 'E' || header[1] != 'F')
+    {
+        printError("\nInvalid Header. Not a Proper Encrypted "
+                   "File!\n");
         return -1;
     }
     return 0;
 }
 
-long_t getPasswordFromFile(ifstream &infile, char passwd[KEY_LENGTH_SIZE_WITH_ZERO]) {
-    long_t passwordLength = (long_t) strlen(passwd);
+long_t getPasswordFromFile(ifstream& infile,
+                           char passwd[KEY_LENGTH_SIZE_WITH_ZERO])
+{
+    long_t passwordLength = (long_t)strlen(passwd);
     long_t passwordCipheredLength = 0;
     char passwdCiphered[KEY_LENGTH_SIZE_WITH_ZERO];
 
@@ -29,8 +34,10 @@ long_t getPasswordFromFile(ifstream &infile, char passwd[KEY_LENGTH_SIZE_WITH_ZE
 
     operationOne(passwordLength, passwd);
 
-    //TODO: Eliminate this Check. Make Wrong Passwords Costly.
-    if (passwordLength != passwordCipheredLength || memcmp(passwdCiphered, passwd, passwordLength) != 0) {
+    // TODO: Eliminate this Check. Make Wrong Passwords Costly.
+    if (passwordLength != passwordCipheredLength ||
+        memcmp(passwdCiphered, passwd, passwordLength) != 0)
+    {
         printError("\nSorry, Probably Wrong Password!\n");
         return -1;
     }
@@ -41,7 +48,8 @@ long_t getPasswordFromFile(ifstream &infile, char passwd[KEY_LENGTH_SIZE_WITH_ZE
     return passwordLength;
 }
 
-long_t getFileNameFromFile(ifstream &infile, char *outfileName) {
+long_t getFileNameFromFile(ifstream& infile, char* outfileName)
+{
     long_t fileNameLength;
     blockRead(fileNameLength, sizeof(long_t), infile);
     blockReadPtr(outfileName, fileNameLength, infile);
@@ -50,13 +58,15 @@ long_t getFileNameFromFile(ifstream &infile, char *outfileName) {
     return fileNameLength;
 }
 
-int verifyCheckSum(ifstream &infile) {
+int verifyCheckSum(ifstream& infile)
+{
     unsigned char preBuiltUpTable[KEY_LENGTH_SIZE_WITH_ZERO];
 
     memset(preBuiltUpTable, 0, sizeof(preBuiltUpTable));
     blockReadPtr(preBuiltUpTable, KEY_LENGTH_SIZE, infile);
 
-    if (memcmp(preBuiltUpTable, upTable, KEY_LENGTH_SIZE) != 0) {
+    if (memcmp(preBuiltUpTable, upTable, KEY_LENGTH_SIZE) != 0)
+    {
         printError("Checksum Mismatch, File Corrupt !\n");
         return -1;
     }
@@ -81,7 +91,8 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     memset(array, 0, sizeof(array));
 
     headerPrint();
-    if (argc != 2) {
+    if (argc != 2)
+    {
         printError("\nFormat: \n");
         printError("%s EncryptedFile\n", argv[0]);
         return -1;
@@ -90,17 +101,20 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     strcpy(infileName, argv[1]);
 
     infile.open(infileName, ios::in | ios_binary);
-    if (!infile) {
+    if (!infile)
+    {
         printError("\nFile: %s not found !\n", infileName);
         return -1;
     }
 
     getPassword(passwd);
-    if(getHeaderFromFile(infile) < 0) {
+    if (getHeaderFromFile(infile) < 0)
+    {
         infile.close();
         return -1;
     }
-    if( (passwordLength = getPasswordFromFile(infile, passwd) ) < 0) {
+    if ((passwordLength = getPasswordFromFile(infile, passwd)) < 0)
+    {
         infile.close();
         return -1;
     }
@@ -110,7 +124,8 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     printf("File Length: %ld\n", (long_t)fileLength);
 
     outfile.open(outfileName, ios::out | ios_binary);
-    if (!outfile) {
+    if (!outfile)
+    {
         printError("\nFile: %s Can't be Written !\n", outfileName);
         infile.close();
         return -1;
@@ -122,8 +137,9 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     initializeIntron(passwordLength, fileNameLength);
 
     beginProgress();
-    for (i = 0; i < numberOfBlocks; i++) {
-        blockReadPtr(array, KEY_LENGTH_SIZE, infile); 
+    for (i = 0; i < numberOfBlocks; i++)
+    {
+        blockReadPtr(array, KEY_LENGTH_SIZE, infile);
         operationSix(KEY_LENGTH_SIZE, array);
         blockWritePtr(array, KEY_LENGTH_SIZE, outfile);
         updateIntron();
@@ -141,14 +157,19 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     completeProgress();
     printf("Done: %s => %s !\n", infileName, outfileName);
 
-    if(verifyCheckSum(infile) != 0) {
-        if (userPromptWithArg("Do you want to delete BAD decrypted file", outfileName) == 'y') {
+    if (verifyCheckSum(infile) != 0)
+    {
+        if (userPromptWithArg("Do you want to delete BAD "
+                              "decrypted file",
+                              outfileName) == 'y')
+        {
             remove(outfileName);
         }
     }
 
     infile.close();
-    if (userPromptWithArg("Do you want to delete", infileName) == 'y') {
+    if (userPromptWithArg("Do you want to delete", infileName) == 'y')
+    {
         remove(infileName);
     }
 

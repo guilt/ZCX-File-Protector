@@ -1,24 +1,30 @@
 // Encryption
-#include "constant.h"
 #include "common.h"
-#include "tables.h"
-#include "intron.h"
-#include "userinp.h"
+#include "constant.h"
 #include "fileinp.h"
+#include "intron.h"
+#include "tables.h"
+#include "userinp.h"
 
-void writeHeaderToFile(ofstream &outfile) {
-    char header[2]={'E','F'};
+void writeHeaderToFile(ofstream& outfile)
+{
+    char header[2] = {'E', 'F'};
     blockWritePtr(header, 2, outfile);
 }
 
-void writePasswordToFile(ofstream &outfile, char passwd[KEY_LENGTH_SIZE_WITH_ZERO], long_t passwordLength) {
+void writePasswordToFile(ofstream& outfile,
+                         char passwd[KEY_LENGTH_SIZE_WITH_ZERO],
+                         long_t passwordLength)
+{
     blockWrite(passwordLength, sizeof(long_t), outfile);
     operationThree(passwordLength, passwd);
     operationOne(passwordLength, passwd);
     blockWritePtr(passwd, passwordLength, outfile);
 }
 
-long_t writeFileNameToFile(ofstream &outfile, char fileName[FILENAME_LENGTH], long_t fileNameLength) {
+long_t writeFileNameToFile(ofstream& outfile, char fileName[FILENAME_LENGTH],
+                           long_t fileNameLength)
+{
     char fileNameTemp[FILENAME_LENGTH];
 
     strcpy(fileNameTemp, fileName);
@@ -30,7 +36,8 @@ long_t writeFileNameToFile(ofstream &outfile, char fileName[FILENAME_LENGTH], lo
     return fileNameLength;
 }
 
-void writeCheckSum(ofstream &outfile) {
+void writeCheckSum(ofstream& outfile)
+{
     outfile.write((char*)upTable, KEY_LENGTH_SIZE);
 }
 
@@ -50,7 +57,8 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     memset(array, 0, sizeof(array));
 
     headerPrint();
-    if(argc < 2 || argc > 3) {
+    if (argc < 2 || argc > 3)
+    {
         printError("\nFormat: \n");
         printError("%s File <EncryptedFile>\n", argv[0]);
         return -1;
@@ -58,19 +66,23 @@ int main(int argc, char* argv[FILENAME_LENGTH])
 
     strcpy(infileName, argv[1]);
 
-    if (argc > 2) {
+    if (argc > 2)
+    {
         strcpy(outFileName, argv[2]);
-    } else {
+    }
+    else
+    {
 #if defined(IDOS)
-        strcpy(outFileName, DEFAULT_FILE); // Default File to Write
-#else //defined(IDOS)
+        strcpy(outFileName, DEFAULT_FILE); // Default File
+#else                                      // defined(IDOS)
         strcpy(outFileName, infileName);
         strcat(outFileName, ".zcx");
-#endif //defined(IDOS)
+#endif                                     // defined(IDOS)
     }
 
     infile.open(infileName, ios::in | ios_binary);
-    if (!infile) {
+    if (!infile)
+    {
         printError("\nFile: %s not found !\n", infileName);
         return -1;
     }
@@ -81,14 +93,15 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     printf("File Length: %ld\n", (long_t)fileLength);
 
     outfile.open(outFileName, ios::out | ios_binary);
-    if (!outfile) {
+    if (!outfile)
+    {
         printError("\nFile: %s Can't be Written !\n", outFileName);
         infile.close();
         return -1;
     }
 
-    passwordLength = (long_t) strlen(passwd);
-    fileNameLength = (long_t) strlen(infileName);
+    passwordLength = (long_t)strlen(passwd);
+    fileNameLength = (long_t)strlen(infileName);
 
     writeHeaderToFile(outfile);
     writePasswordToFile(outfile, passwd, passwordLength);
@@ -102,7 +115,8 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     initializeIntron(passwordLength, fileNameLength);
 
     beginProgress();
-    for (i = 0; i < numberOfBlocks; i++) {
+    for (i = 0; i < numberOfBlocks; i++)
+    {
         blockReadPtr(array, KEY_LENGTH_SIZE, infile);
         operationSeven(KEY_LENGTH_SIZE, array);
         blockWritePtr(array, KEY_LENGTH_SIZE, outfile);
@@ -123,7 +137,8 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     printf("Done: %s => %s !\n", infileName, outFileName);
 
     infile.close();
-    if (userPromptWithArg("Do you want to delete", infileName) == 'y') {
+    if (userPromptWithArg("Do you want to delete", infileName) == 'y')
+    {
         remove(infileName);
     }
 
