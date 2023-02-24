@@ -1,8 +1,6 @@
 #ifndef ZCX_INTRON_H
 #define ZCX_INTRON_H
 
-#define USE_INTRON // By Default.
-
 #if defined(USE_INTRON)
 #include "common.h"
 
@@ -75,7 +73,7 @@ extern "C"
 
 #else // defined(USE_INTRON)
 
-#define initializeIntron()
+#define initializeIntron(passwordLength, fileNameLength)
 #define writeIntron()
 #define readIntron()
 #define updateIntron()

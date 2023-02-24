@@ -15,6 +15,9 @@ if(CMAKE_BUILD_TYPE MATCHES DEBUG)
   add_definitions(-DDEBUG)
 endif()
 
+# Default Defines.
+add_definitions(-DUSE_INTRON)
+
 if(WIN32)
   # See https://blog.kitware.com/create-dlls-on-windows-without-declspec-using-new-cmake-export-all-feature/
   set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
