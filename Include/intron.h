@@ -12,20 +12,24 @@ extern "C"
     extern unsigned char intronTable[KEY_LENGTH_SIZE];
     extern unsigned char decodeIntronTable[KEY_LENGTH_SIZE];
 
-    extern long_t intronFactor;
+    extern long_t intronFactor; // Maximum Insertion Length
+    extern long_t intronOffset;
     extern long_t intronCounter;
 }
 
-#define initializeIntron(passwordLength, fileNameLength) \
-    intronFactor = ((passwordLength * fileNameLength) + 1);
-
 #if defined(DEBUG)
+
+#define initializeIntron(passwordLength, fileNameLength)              \
+    intronFactor = ((passwordLength * fileNameLength) + 1);           \
+    intronOffset = passwordLength;                                    \
+    printf("DEBUG: [Intron] Factor: %ld Offset: %ld\n", intronFactor, \
+           intronOffset);
 
 #define writeIntron()                                                \
     if ((intronCounter % intronFactor) == 0)                         \
     {                                                                \
         long_t intronLength =                                        \
-            (passwordLength + intronCounter) % KEY_LENGTH_SIZE;      \
+            (intronOffset + intronCounter) % KEY_LENGTH_SIZE;        \
         printf("DEBUG: [Intron] Writing: %d Bytes\n", intronLength); \
         outfile.write((char*)intronTable, intronLength);             \
     }
@@ -34,32 +38,40 @@ extern "C"
     if ((intronCounter % intronFactor) == 0)                         \
     {                                                                \
         long_t intronLength =                                        \
-            (passwordLength + intronCounter) % KEY_LENGTH_SIZE;      \
+            (intronOffset + intronCounter) % KEY_LENGTH_SIZE;        \
         printf("DEBUG: [Intron] Reading: %d Bytes\n", intronLength); \
         infile.read((char*)decodeIntronTable, intronLength);         \
     }
 
+#define updateIntron() \
+    intronCounter++;   \
+    printf("DEBUG: [Intron] Counter: %ld\n", intronCounter);
+
 #else // defined(DEBUG)
 
-#define writeIntron()                                           \
-    if ((intronCounter % intronFactor) == 0)                    \
-    {                                                           \
-        long_t intronLength =                                   \
-            (passwordLength + intronCounter) % KEY_LENGTH_SIZE; \
-        outfile.write((char*)intronTable, intronLength);        \
+#define initializeIntron(passwordLength, fileNameLength)    \
+    intronFactor = ((passwordLength * fileNameLength) + 1); \
+    intronOffset = passwordLength;
+
+#define writeIntron()                                         \
+    if ((intronCounter % intronFactor) == 0)                  \
+    {                                                         \
+        long_t intronLength =                                 \
+            (intronOffset + intronCounter) % KEY_LENGTH_SIZE; \
+        outfile.write((char*)intronTable, intronLength);      \
     }
 
-#define readIntron()                                            \
-    if ((intronCounter % intronFactor) == 0)                    \
-    {                                                           \
-        long_t intronLength =                                   \
-            (passwordLength + intronCounter) % KEY_LENGTH_SIZE; \
-        infile.read((char*)decodeIntronTable, intronLength);    \
+#define readIntron()                                          \
+    if ((intronCounter % intronFactor) == 0)                  \
+    {                                                         \
+        long_t intronLength =                                 \
+            (intronOffset + intronCounter) % KEY_LENGTH_SIZE; \
+        infile.read((char*)decodeIntronTable, intronLength);  \
     }
+
+#define updateIntron() intronCounter++;
 
 #endif // defined(DEBUG)
-
-#define updateIntron() intronCounter++
 
 #else // defined(USE_INTRON)
 

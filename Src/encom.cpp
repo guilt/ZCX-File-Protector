@@ -41,78 +41,15 @@ void writeCheckSum(ofstream& outfile)
     outfile.write((char*)upTable, KEY_LENGTH_SIZE);
 }
 
-int main(int argc, char* argv[FILENAME_LENGTH])
+void performEncrypt(long_t fileLength, ifstream& infile, ofstream& outfile)
 {
-    long_t i, extraSpace, numberOfBlocks, fileLength;
-    long_t passwordLength, fileNameLength;
-
+    long_t i, numberOfBlocks, extraSpace;
     unsigned char array[KEY_LENGTH_SIZE];
-    char infileName[FILENAME_LENGTH], outFileName[FILENAME_LENGTH];
-
-    char passwd[KEY_LENGTH_SIZE_WITH_ZERO];
-
-    ifstream infile;
-    ofstream outfile;
-
-    memset(array, 0, sizeof(array));
-
-    headerPrint();
-    if (argc < 2 || argc > 3)
-    {
-        printError("\nFormat: \n");
-        printError("%s File <EncryptedFile>\n", argv[0]);
-        return -1;
-    }
-
-    strcpy(infileName, argv[1]);
-
-    if (argc > 2)
-    {
-        strcpy(outFileName, argv[2]);
-    }
-    else
-    {
-#if defined(IDOS)
-        strcpy(outFileName, DEFAULT_FILE); // Default File
-#else                                      // defined(IDOS)
-        strcpy(outFileName, infileName);
-        strcat(outFileName, ".zcx");
-#endif                                     // defined(IDOS)
-    }
-
-    infile.open(infileName, ios::in | ios_binary);
-    if (!infile)
-    {
-        printError("\nFile: %s not found !\n", infileName);
-        return -1;
-    }
-
-    getPasswordWithConfirmation(passwd);
-
-    getFileLength(fileLength, infile);
-    printf("File Length: %ld\n", (long_t)fileLength);
-
-    outfile.open(outFileName, ios::out | ios_binary);
-    if (!outfile)
-    {
-        printError("\nFile: %s Can't be Written !\n", outFileName);
-        infile.close();
-        return -1;
-    }
-
-    passwordLength = (long_t)strlen(passwd);
-    fileNameLength = (long_t)strlen(infileName);
-
-    writeHeaderToFile(outfile);
-    writePasswordToFile(outfile, passwd, passwordLength);
-    writeFileNameToFile(outfile, infileName, fileNameLength);
-
-    blockWrite(fileLength, sizeof(long_t), outfile);
 
     extraSpace = fileLength % KEY_LENGTH_SIZE;
     numberOfBlocks = fileLength / KEY_LENGTH_SIZE;
 
-    initializeIntron(passwordLength, fileNameLength);
+    memset(array, 0, KEY_LENGTH_SIZE);
 
     beginProgress();
     for (i = 0; i < numberOfBlocks; i++)
@@ -130,13 +67,84 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     blockWritePtr(array, extraSpace, outfile);
     updateIntron();
     writeIntron();
+}
+
+int parseArgs(int argc, char** argv, char infileName[FILENAME_LENGTH],
+              char outfileName[FILENAME_LENGTH])
+{
+    if (argc < 2 || argc > 3)
+    {
+        printError("\nFormat: \n");
+        printError("%s File <EncryptedFile>\n", argv[0]);
+        return -1;
+    }
+
+    strcpy(infileName, argv[1]);
+
+    strcpy(outfileName, DEFAULT_FILE); // Default File
+    if (argc > 2)
+    {
+        strcpy(outfileName, argv[2]);
+    }
+
+    return 0;
+}
+
+int main(int argc, char** argv)
+{
+    long_t passwordLength, fileNameLength, fileLength;
+
+    char infileName[FILENAME_LENGTH], outfileName[FILENAME_LENGTH];
+    char passwd[KEY_LENGTH_SIZE_WITH_ZERO];
+
+    ifstream infile;
+    ofstream outfile;
+
+    titlePrint();
+    if (parseArgs(argc, argv, infileName, outfileName) < 0)
+    {
+        return -1;
+    }
+
+    infile.open(infileName, ios::in | ios_binary);
+    if (!infile)
+    {
+        printError("\nFile: %s Can't be Read!\n", infileName);
+        return -1;
+    }
+
+    getPasswordWithConfirmation(passwd);
+    passwordLength = (long_t)strlen(passwd);
+    fileNameLength = (long_t)strlen(infileName);
+    initializeIntron(passwordLength, fileNameLength);
+
+    detectFileLength(fileLength, infile);
+    printf("File Length: %ld\n", (long_t)fileLength);
+
+    outfile.open(outfileName, ios::out | ios_binary);
+    if (!outfile)
+    {
+        printError("\nFile: %s Can't be Written !\n", outfileName);
+        infile.close();
+        return -1;
+    }
+
+    writeHeaderToFile(outfile);
+    writePasswordToFile(outfile, passwd, passwordLength);
+    writeFileNameToFile(outfile, infileName, fileNameLength);
+
+    blockWrite(fileLength, sizeof(long_t), outfile);
+
+    performEncrypt(fileLength, infile, outfile);
 
     writeCheckSum(outfile);
     outfile.close();
     completeProgress();
-    printf("Done: %s => %s !\n", infileName, outFileName);
 
     infile.close();
+
+    printf("Processed: %s => %s\n", infileName, outfileName);
+
     if (userPromptWithArg("Do you want to delete", infileName) == 'y')
     {
         remove(infileName);

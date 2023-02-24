@@ -14,7 +14,7 @@ extern "C"
     unsigned char decodeIntronTable[KEY_LENGTH_SIZE];
 
     long_t intronFactor = 1; // Maximum Insertion Length
-                             // Parameter
+    long_t intronOffset = KEY_LENGTH_SIZE;
     long_t intronCounter = 0;
 
 #endif // defined(USE_INTRON)

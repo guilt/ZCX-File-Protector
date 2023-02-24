@@ -18,9 +18,9 @@ using namespace std;
 #define ios_binary ios::binary
 #endif // defined(IUNI)
 
-#define getFileLength(fileLength, infile) \
-    infile.seekg(0, ios::end);            \
-    fileLength = (long_t)infile.tellg();  \
+#define detectFileLength(fileLength, infile) \
+    infile.seekg(0, ios::end);               \
+    fileLength = (long_t)infile.tellg();     \
     infile.seekg(0, ios::beg);
 
 #if defined(DEBUG)

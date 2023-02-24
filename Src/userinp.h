@@ -164,7 +164,7 @@ void printInitializedValues()
 #endif // defined(DEBUG)
 }
 
-void headerPrint()
+void titlePrint()
 {
     printf("*** Version %s File Protector ***\n", VER);
     printf("        Authored By %s\n", AUTHOR);

@@ -13,8 +13,7 @@ int getHeaderFromFile(ifstream& infile)
     blockReadPtr(header, 2, infile);
     if (header[0] != 'E' || header[1] != 'F')
     {
-        printError("\nInvalid Header. Not a Proper Encrypted "
-                   "File!\n");
+        printError("\nInvalid Header. Not a Proper File!\n");
         return -1;
     }
     return 0;
@@ -65,74 +64,23 @@ int verifyCheckSum(ifstream& infile)
 
     if (memcmp(preBuiltUpTable, upTable, KEY_LENGTH_SIZE) != 0)
     {
-        printError("Checksum Mismatch, File Corrupt !\n");
+        printError("Checksum Mismatch, File Corrupt!\n");
         return -1;
     }
 
-    printf("Checksum Match, File OK !\n");
+    printf("Checksum Match, File OK!\n");
     return 0;
 }
 
-int main(int argc, char* argv[FILENAME_LENGTH])
+void performDecrypt(long_t fileLength, ifstream& infile, ofstream& outfile)
 {
     long_t i, numberOfBlocks, extraSpace;
-    long_t passwordLength, fileNameLength, fileLength;
-
     unsigned char array[KEY_LENGTH_SIZE];
-    char infileName[FILENAME_LENGTH], outfileName[FILENAME_LENGTH];
-
-    char passwd[KEY_LENGTH_SIZE_WITH_ZERO];
-
-    ifstream infile;
-    ofstream outfile;
-
-    memset(array, 0, sizeof(array));
-
-    headerPrint();
-    if (argc != 2)
-    {
-        printError("\nFormat: \n");
-        printError("%s EncryptedFile\n", argv[0]);
-        return -1;
-    }
-
-    strcpy(infileName, argv[1]);
-
-    infile.open(infileName, ios::in | ios_binary);
-    if (!infile)
-    {
-        printError("\nFile: %s not found !\n", infileName);
-        return -1;
-    }
-
-    getPassword(passwd);
-    if (getHeaderFromFile(infile) < 0)
-    {
-        infile.close();
-        return -1;
-    }
-    if ((passwordLength = getPasswordFromFile(infile, passwd)) < 0)
-    {
-        infile.close();
-        return -1;
-    }
-    fileNameLength = getFileNameFromFile(infile, outfileName);
-
-    blockRead(fileLength, sizeof(long_t), infile);
-    printf("File Length: %ld\n", (long_t)fileLength);
-
-    outfile.open(outfileName, ios::out | ios_binary);
-    if (!outfile)
-    {
-        printError("\nFile: %s Can't be Written !\n", outfileName);
-        infile.close();
-        return -1;
-    }
 
     extraSpace = fileLength % KEY_LENGTH_SIZE;
     numberOfBlocks = fileLength / KEY_LENGTH_SIZE;
 
-    initializeIntron(passwordLength, fileNameLength);
+    memset(array, 0, KEY_LENGTH_SIZE);
 
     beginProgress();
     for (i = 0; i < numberOfBlocks; i++)
@@ -150,23 +98,97 @@ int main(int argc, char* argv[FILENAME_LENGTH])
     blockWritePtr(array, extraSpace, outfile);
     updateIntron();
     readIntron();
+}
+
+int parseArgs(int argc, char** argv, char infileName[FILENAME_LENGTH])
+{
+    if (argc > 2)
+    {
+        printError("\nFormat: \n");
+        printError("%s <EncryptedFile>\n", argv[0]);
+        return -1;
+    }
+
+    strcpy(infileName, DEFAULT_FILE); // Default File
+    if (argc > 1)
+    {
+        strcpy(infileName, argv[1]);
+    }
+
+    return 0;
+}
+
+int main(int argc, char** argv)
+{
+    long_t passwordLength, fileNameLength, fileLength;
+
+    char infileName[FILENAME_LENGTH], outfileName[FILENAME_LENGTH];
+    char passwd[KEY_LENGTH_SIZE_WITH_ZERO];
+
+    int verifiedCheckSum;
+
+    ifstream infile;
+    ofstream outfile;
+
+    titlePrint();
+    if (parseArgs(argc, argv, infileName) < 0)
+    {
+        return -1;
+    }
+
+    infile.open(infileName, ios::in | ios_binary);
+    if (!infile)
+    {
+        printError("\nFile: %s Can't be Read!\n", infileName);
+        return -1;
+    }
+
+    getPassword(passwd);
+
+    if (getHeaderFromFile(infile) < 0)
+    {
+        infile.close();
+        return -1;
+    }
+
+    if ((passwordLength = getPasswordFromFile(infile, passwd)) < 0)
+    {
+        infile.close();
+        return -1;
+    }
+
+    fileNameLength = getFileNameFromFile(infile, outfileName);
+    initializeIntron(passwordLength, fileNameLength);
+
+    blockRead(fileLength, sizeof(long_t), infile);
+    printf("File Length: %ld\n", (long_t)fileLength);
+
+    outfile.open(outfileName, ios::out | ios_binary);
+    if (!outfile)
+    {
+        printError("\nFile: %s Can't be Written!\n", outfileName);
+        infile.close();
+        return -1;
+    }
+
+    performDecrypt(fileLength, infile, outfile);
 
     outfile.close();
     completeProgress();
-    printf("Done: %s => %s !\n", infileName, outfileName);
 
-    if (verifyCheckSum(infile) != 0)
+    verifiedCheckSum = verifyCheckSum(infile);
+    infile.close();
+
+    printf("Processed: %s => %s\n", infileName, outfileName);
+
+    if (verifiedCheckSum < 0)
     {
-        if (userPromptWithArg("Do you want to delete BAD "
-                              "decrypted file",
-                              outfileName) == 'y')
+        if (userPromptWithArg("Do you want to delete", outfileName) == 'y')
         {
             remove(outfileName);
         }
     }
-
-    infile.close();
-    if (userPromptWithArg("Do you want to delete", infileName) == 'y')
+    else if (userPromptWithArg("Do you want to delete", infileName) == 'y')
     {
         remove(infileName);
     }

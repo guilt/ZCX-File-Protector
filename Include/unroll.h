@@ -93,7 +93,7 @@
 #define unrollLevel 8
 #endif // unrollLevel
 
-// Set _unroll unrollLevel.
+// Set UnrollRest.
 #if (unrollLevel >= 128)
 #define _unrollRest _unroll128
 #elif (unrollLevel >= 64)
@@ -382,22 +382,22 @@
 #endif // _avail128
 
 #ifdef _unrollRest
-#define D_rest(v, n, x)         \
-    while (v)                   \
-    {                           \
-        _unrollRest(x);         \
-        v -= unrollLevel;       \
+#define D_rest(v, n, x)   \
+    while (v)             \
+    {                     \
+        _unrollRest(x);   \
+        v -= unrollLevel; \
     }
 #define D_S_rest(v, n, x)       \
     while (v)                   \
     {                           \
         _unrollRest(x; v -= 1); \
     }
-#define U_rest(v, n, x)         \
-    while (n - v)               \
-    {                           \
-        _unrollRest(x);         \
-        v += unrollLevel;       \
+#define U_rest(v, n, x)   \
+    while (n - v)         \
+    {                     \
+        _unrollRest(x);   \
+        v += unrollLevel; \
     }
 #define U_S_rest(v, n, x)       \
     while (n - v)               \
