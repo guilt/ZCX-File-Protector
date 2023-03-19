@@ -252,7 +252,7 @@ void getPasswordWithConfirmation(char passwd[KEY_LENGTH_SIZE_WITH_ZERO])
 #define beginProgress() printf("Progress Status: %03d %%", 0);
 
 #define updateProgress(current, full) \
-    printf("\b\b\b\b\b%03d %%", (int)((long_t)(current * 100) / full));
+    if ((current & 31) == 0) printf("\b\b\b\b\b%03d %%", (int)((long_t)(current * 100) / full));
 
 #define completeProgress() printf("\b\b\b\b\b%03d %%\n", 100);
 
