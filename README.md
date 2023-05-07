@@ -6,15 +6,23 @@ circa 2001.
 
 ## Compatibility
 
-Files encrypted in one Operating System are compatible with the others
-too.
+There are some compatibility rules you would want to follow, if
+the files encrypted in one OS need to be compatible with the
+others too.
 
-Ensure that the file names are in the **DOS 8.3 format**
+* Ensure that the file names are in the **DOS 8.3 format**
 (such as `.HTM`, `.MPG` ) for best compatibility.
 
-The File to be Encrypted must ideally be in the current working
-directory. Avoid usage of `.` and `..` or Directory separators
-such as `/` or `\` in files, we don't try to interpret them.
+* The files must ideally be in the current working
+directory. Avoid usage of `.` and `..` or directory
+separators such as `/` or `\` in files, we don't try
+to interpret them.
+
+* Ideally, the files are meant to be less than 2GB, to
+allow working on the older compilers without many issues. No
+guarantees are made on files larger or equal to that size. Use
+compression and file size splitting to ensure you do not
+encounter these bugs when running this program.
 
 ## How to Use
 
@@ -40,11 +48,11 @@ Use your judgment.
 Please see accompanying `LICENSE` for how this code is meant
 to be used.
 
-## Compatibility
+## Version Compatibility
 
 When you use the most current version, files in the previous
-versions won't work. So please retain the Older Version of
-the Executables for Decrypting Purposes.
+versions are not guaranteed to work. So please retain older versions of
+executables for decrypting.
 
 ## Thank You and Feedback
 
