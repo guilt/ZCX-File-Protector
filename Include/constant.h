@@ -14,16 +14,16 @@
 
 #define DEFAULT_FILE "FPCODED.ZCX"
 
-#if defined(IDOS) || defined(IUNI)
+#if defined(IDOS) || defined(IUNI) || (defined(_MSC_VER) && _MSC_VER <= 160020506)
 
 #define long_t long
 
-#else // defined(IDOS) || defined(IUNI)
+#else // defined(IDOS) || defined(IUNI) || (defined(_MSC_VER) && _MSC_VER <= 160020506)
 
 #include <stdint.h>
 
 #define long_t int32_t
 
-#endif // defined(IDOS) || defined(IUNI)
+#endif // defined(IDOS) || defined(IUNI) || (defined(_MSC_VER) && _MSC_VER <= 160020506)
 
 #endif // ZCX_CONSTANTS_H
